@@ -9,6 +9,7 @@ import net.thucydides.core.steps.StepFailure;
 import net.thucydides.core.steps.StepListener;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -42,6 +43,10 @@ public class TeamCityStepListener implements StepListener {
 
     public TeamCityStepListener(Logger logger) {
         this.logger = logger;
+    }
+
+    public TeamCityStepListener() {
+        this(LoggerFactory.getLogger(TeamCityStepListener.class));
     }
 
     private String escapeProperty(String value) {
@@ -305,7 +310,6 @@ public class TeamCityStepListener implements StepListener {
 
     @Override
     public void useExamplesFrom(DataTable table) {
-        //TODO run examples test in test suite
     }
 
     @Override
