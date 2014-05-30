@@ -1,4 +1,4 @@
-package net.thucydides.steplistener;
+package com.github.crystalservice;
 
 import net.thucydides.core.model.TestResult;
 import net.thucydides.core.model.TestStep;

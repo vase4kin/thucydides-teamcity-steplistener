@@ -1,4 +1,4 @@
-package net.thucydides.steplistener;
+package com.github.crystalservice;
 
 import net.thucydides.core.model.DataTable;
 import net.thucydides.core.model.Story;

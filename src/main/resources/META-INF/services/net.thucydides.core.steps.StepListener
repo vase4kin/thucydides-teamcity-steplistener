@@ -1,1 +1,1 @@
-net.thucydides.steplistener.TeamCityStepListener
+com.github.crystalservice.TeamCityStepListener
