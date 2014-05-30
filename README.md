@@ -7,10 +7,25 @@ Requirements
 ------------
 
 * TeamCity 7.0+
+* Thucydides
 
 Installation
 ------------
 
+Simply add a dependency to your project's pom file:
+
+        <dependency>
+            <groupId>com.github.crystalservice</groupId>
+            <artifactId>thucydides-teamcity-steplistener</artifactId>
+            <version>0.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-lang</groupId>
+                    <artifactId>commons-lang</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
 Documentation
 -------------
 
