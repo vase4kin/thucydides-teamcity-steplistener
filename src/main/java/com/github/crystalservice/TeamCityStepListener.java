@@ -269,8 +269,6 @@ public class TeamCityStepListener implements StepListener {
 
     @Override
     public void testIgnored() {
-        Map<String, String> properties = new HashMap<>();
-        printMessage("testIgnored", properties);
     }
 
     @Override
