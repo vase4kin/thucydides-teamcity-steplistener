@@ -86,7 +86,9 @@ public class TeamCityStepListener implements StepListener {
 
     @Override
     public void testSuiteStarted(Class<?> storyClass) {
-        printMessage("testSuiteStarted", storyClass.getSimpleName());
+        String storyClassName = storyClass.getName();
+        suiteStack.push(storyClassName);
+        printTestSuiteStarted(storyClassName);
     }
 
     @Override
@@ -263,7 +265,6 @@ public class TeamCityStepListener implements StepListener {
 
     @Override
     public void testFailed(TestOutcome testOutcome, Throwable cause) {
-        printMessage("testFailed", getResultTitle(testOutcome));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.github.crystalservice;
 
+import junit.framework.TestCase;
 import net.thucydides.core.model.DataTable;
 import net.thucydides.core.model.Story;
 import net.thucydides.core.model.TestOutcome;
@@ -263,6 +264,35 @@ public class TeamCityStepListenerTests {
         assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
         assertThat(stringArgumentCaptor.getAllValues().get(1), is(testFailedExpectedMessage));
         assertThat(stringArgumentCaptor.getAllValues().get(2), is(testFinishedExpectedMessage));
+    }
 
+    @Test
+    public void testSuiteIsAStoryClass() {
+
+        teamCityStepListener.testSuiteStarted(TestCase.class);
+        teamCityStepListener.testSuiteFinished();
+
+        String testStartedExpectedMessage = "##teamcity[testSuiteStarted  name='junit.framework.TestCase']";
+        String testFinishedExpectedMessage = "##teamcity[testSuiteFinished  name='junit.framework.TestCase']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(2)).info(stringArgumentCaptor.capture());
+        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testFinishedExpectedMessage));
+    }
+
+    @Test
+    public void testSuiteIsAStory() {
+
+        teamCityStepListener.testSuiteStarted(STORY);
+        teamCityStepListener.testSuiteFinished();
+
+        String testStartedExpectedMessage = "##teamcity[testSuiteStarted  name='Test story']";
+        String testFinishedExpectedMessage = "##teamcity[testSuiteFinished  name='Test story']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(2)).info(stringArgumentCaptor.capture());
+        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testFinishedExpectedMessage));
     }
 }
