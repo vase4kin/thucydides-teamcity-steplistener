@@ -26,6 +26,20 @@ Simply add a dependency to your project's pom file:
             </exclusions>
         </dependency>
         
+And add a configuration parameter to your maven-failsafe-plugin:
+
+        <disableXmlReport>true</disableXmlReport>
+        
+For example like this:
+
+        <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.11</version>
+                <configuration>
+                    <disableXmlReport>true</disableXmlReport>
+                </configuration>
+        </plugin>            
+        
 Documentation
 -------------
 
