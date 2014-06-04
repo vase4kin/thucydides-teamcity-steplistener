@@ -215,8 +215,8 @@ public class TeamCityStepListener implements StepListener {
 
     private String getResultTitle(TestOutcome result) {
         String path = result.getPath();
-        if (path.startsWith("stories/")) {
-            path = path.substring(8);
+        if(path.contains("stories/")) {
+            path = path.split("stories/")[1];
         }
         if (path.endsWith(".story")) {
             path = path.substring(0, path.length() - 6);

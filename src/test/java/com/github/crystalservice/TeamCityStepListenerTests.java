@@ -272,13 +272,13 @@ public class TeamCityStepListenerTests {
         teamCityStepListener.testSuiteStarted(TestCase.class);
         teamCityStepListener.testSuiteFinished();
 
-        String testStartedExpectedMessage = "##teamcity[testSuiteStarted  name='junit.framework.TestCase']";
-        String testFinishedExpectedMessage = "##teamcity[testSuiteFinished  name='junit.framework.TestCase']";
+        String testSuiteStartedExpectedMessage = "##teamcity[testSuiteStarted  name='junit.framework.TestCase']";
+        String testSuiteFinishedExpectedMessage = "##teamcity[testSuiteFinished  name='junit.framework.TestCase']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(logger, times(2)).info(stringArgumentCaptor.capture());
-        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
-        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testFinishedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testSuiteStartedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testSuiteFinishedExpectedMessage));
     }
 
     @Test
@@ -287,8 +287,29 @@ public class TeamCityStepListenerTests {
         teamCityStepListener.testSuiteStarted(STORY);
         teamCityStepListener.testSuiteFinished();
 
-        String testStartedExpectedMessage = "##teamcity[testSuiteStarted  name='Test story']";
-        String testFinishedExpectedMessage = "##teamcity[testSuiteFinished  name='Test story']";
+        String testSuiteStartedExpectedMessage = "##teamcity[testSuiteStarted  name='Test story']";
+        String testSuiteFinishedExpectedMessage = "##teamcity[testSuiteFinished  name='Test story']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(2)).info(stringArgumentCaptor.capture());
+        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testSuiteStartedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testSuiteFinishedExpectedMessage));
+    }
+
+    @Test
+    public void testResultTitleIfPathIsDifferent() {
+
+        String storyPath = "jbehave/stories/consult_dictionary/LookupADefinition.story";
+        Story story = Story.withIdAndPath("storyId", "Test story", storyPath);
+
+        TestOutcome testOutcome = new TestOutcome("passedScenario");
+        testOutcome.setUserStory(story);
+        testOutcome.recordStep(TestStepFactory.getSuccessfulTestStep("Passed"));
+
+        teamCityStepListener.testFinished(testOutcome);
+
+        String testStartedExpectedMessage = "##teamcity[testStarted  name='consult_dictionary.LookupADefinition.passedScenario']";
+        String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='consult_dictionary.LookupADefinition.passedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(logger, times(2)).info(stringArgumentCaptor.capture());
