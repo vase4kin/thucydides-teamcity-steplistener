@@ -17,7 +17,7 @@ Simply add a dependency to your project's pom file:
         <dependency>
             <groupId>com.github.crystalservice</groupId>
             <artifactId>thucydides-teamcity-steplistener</artifactId>
-            <version>0.1</version>
+            <version>0.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-lang</groupId>
@@ -25,6 +25,20 @@ Simply add a dependency to your project's pom file:
                 </exclusion>
             </exclusions>
         </dependency>
+        
+And add a configuration parameter to your maven-failsafe-plugin:
+
+        <disableXmlReport>true</disableXmlReport>
+        
+For example like this:
+
+        <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.11</version>
+                <configuration>
+                    <disableXmlReport>true</disableXmlReport>
+                </configuration>
+        </plugin>            
         
 Documentation
 -------------
