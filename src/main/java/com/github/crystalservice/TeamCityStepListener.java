@@ -45,6 +45,8 @@ public class TeamCityStepListener implements StepListener {
         this.logger = logger;
     }
 
+    private String currentTestSuiteName = "";
+
     public TeamCityStepListener() {
         this(LoggerFactory.getLogger(TeamCityStepListener.class));
     }
@@ -87,8 +89,11 @@ public class TeamCityStepListener implements StepListener {
     @Override
     public void testSuiteStarted(Class<?> storyClass) {
         String storyClassName = storyClass.getName();
-        suiteStack.push(storyClassName);
-        printTestSuiteStarted(storyClassName);
+        if (!currentTestSuiteName.equals(storyClassName)) {
+            suiteStack.push(storyClassName);
+            printTestSuiteStarted(storyClassName);
+            currentTestSuiteName = storyClassName;
+        }
     }
 
     @Override
@@ -215,8 +220,8 @@ public class TeamCityStepListener implements StepListener {
 
     private String getResultTitle(TestOutcome result) {
         String path = result.getPath();
-        if (path.startsWith("stories/")) {
-            path = path.substring(8);
+        if(path.contains("stories/")) {
+            path = path.split("stories/")[1];
         }
         if (path.endsWith(".story")) {
             path = path.substring(0, path.length() - 6);

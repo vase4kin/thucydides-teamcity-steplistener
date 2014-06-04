@@ -17,7 +17,7 @@ Simply add a dependency to your project's pom file:
         <dependency>
             <groupId>com.github.crystalservice</groupId>
             <artifactId>thucydides-teamcity-steplistener</artifactId>
-            <version>0.2</version>
+            <version>0.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-lang</groupId>
@@ -26,7 +26,9 @@ Simply add a dependency to your project's pom file:
             </exclusions>
         </dependency>
         
-And add a configuration parameter to your maven-failsafe-plugin:
+####JBehave:
+        
+Add a configuration parameter to your maven-failsafe-plugin:
 
         <disableXmlReport>true</disableXmlReport>
         
@@ -39,11 +41,36 @@ For example like this:
                     <disableXmlReport>true</disableXmlReport>
                 </configuration>
         </plugin>            
+
+####JUnit:
+
+Add a configuration parameters to your maven-surefire-plugin:
+
+        <disableXmlReport>true</disableXmlReport>
+        <skip>false</skip>
         
+        
+For example like this:
+
+        <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12</version>
+                <configuration>
+                    <disableXmlReport>true</disableXmlReport>
+                    <skip>false</skip>
+                </configuration>
+        </plugin>           
+
 Documentation
 -------------
 
+####JBehave: 
+Run with `mvn integration-test` command
+
+####JUnit:
+Run with `mvn test` command
+
+####TeamCity:
 Press "Run..." button in TeamCity.
 Now build will display executed tests in realtime in "Overview" screen
-
-
