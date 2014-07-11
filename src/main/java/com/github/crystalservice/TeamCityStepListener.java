@@ -135,9 +135,15 @@ public class TeamCityStepListener implements StepListener {
     private void printFailure(TestOutcome result) {
         HashMap<String, String> properties = new HashMap<>();
         properties.put("name", getResultTitle(result));
-        properties.put("message", result.getTestFailureCause().getMessage() != null ? result.getTestFailureCause().getMessage() : "");
+        properties.put("message", getTestOutComeTestFailureCauseMessage(result.getTestFailureCause()));
         properties.put("details", getStepsInfo(result.getTestSteps()));
         printMessage("testFailed", properties);
+    }
+
+    private String getTestOutComeTestFailureCauseMessage(Throwable throwable) {
+        return throwable != null && !(throwable instanceof NullPointerException)
+                ? throwable.getMessage()
+                : "";
     }
 
     private void printExampleResults(TestOutcome result) {
@@ -190,7 +196,7 @@ public class TeamCityStepListener implements StepListener {
 
     private Boolean hasPendingStep(List<TestStep> testSteps) {
         for (TestStep testStep : testSteps) {
-            if (testStep.isSkipped() || testStep.isPending()) {
+            if (testStep.isSkipped() || testStep.isPending() || testStep.isIgnored()) {
                 return true;
             }
         }

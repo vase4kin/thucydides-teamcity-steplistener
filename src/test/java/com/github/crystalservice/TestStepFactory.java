@@ -23,6 +23,10 @@ public class TestStepFactory {
         return createNewTestStep(description, ERROR, assertionError);
     }
 
+    public static TestStep getErrorTestStep(String description) {
+        return createNewTestStep(description, ERROR);
+    }
+
     public static TestStep getSkippedTestStep(String description) {
         return createNewTestStep(description, SKIPPED);
     }
@@ -38,7 +42,7 @@ public class TestStepFactory {
     public static TestStep createNewTestStep(String description, TestResult result, Throwable assertionError) {
         TestStep step = new TestStep(description);
         step.setResult(result);
-        step.failedWith(assertionError);
+        step.testAborted(assertionError);
         step.setDuration(100);
         return step;
     }
