@@ -22,7 +22,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 /**
  * Test class to test implemented team city thucydides step listener
  */
-public class TeamCityStepListenerTests {
+public class TeamCityStepListenerTest {
 
     @Mock
     private Logger logger;
