@@ -67,12 +67,38 @@ public class TeamCityStepListenerTest {
         TestOutcome testOutcome = new TestOutcome("failedScenario");
         testOutcome.setUserStory(STORY);
         testOutcome.recordStep(TestStepFactory.getFailureTestStep("Failed scenario step", THROWABLE));
-        testOutcome.setTestFailureCause(THROWABLE);
+        TestOutcome mockedTestOutcome = spy(testOutcome);
+        doReturn(THROWABLE).when(mockedTestOutcome).getTestFailureCause();
 
-        teamCityStepListener.testFinished(testOutcome);
+        teamCityStepListener.testFinished(mockedTestOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(3)).info(stringArgumentCaptor.capture());
+
+        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testFailedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(2), is(testFinishedExpectedMessage));
+    }
+
+    @Test
+    public void testScenarioChildStepResultIsError() {
+
+        TestOutcome testOutcome = new TestOutcome("failedScenario");
+        testOutcome.setUserStory(STORY);
+        TestStep testStep = TestStepFactory.getErrorTestStep("Failed scenario step");
+        testStep.addChildStep(TestStepFactory.getErrorTestStep("Failed scenario child step", THROWABLE));
+        testOutcome.recordStep(testStep);
+        TestOutcome mockedTestOutcome = spy(testOutcome);
+        doReturn(THROWABLE).when(mockedTestOutcome).getTestFailureCause();
+
+        teamCityStepListener.testFinished(mockedTestOutcome);
+
+        String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nChildren Steps:|r|nFailed scenario child step (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -91,12 +117,13 @@ public class TeamCityStepListenerTest {
         TestStep testStep = TestStepFactory.getFailureTestStep("Failed scenario step");
         testStep.addChildStep(TestStepFactory.getFailureTestStep("Failed scenario child step", THROWABLE));
         testOutcome.recordStep(testStep);
-        testOutcome.setTestFailureCause(THROWABLE);
+        TestOutcome mockedTestOutcome = spy(testOutcome);
+        doReturn(THROWABLE).when(mockedTestOutcome).getTestFailureCause();
 
-        teamCityStepListener.testFinished(testOutcome);
+        teamCityStepListener.testFinished(mockedTestOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nChildren Steps:|r|nFailed scenario child step (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|nChildren Steps:|r|nFailed scenario child step (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -113,9 +140,10 @@ public class TeamCityStepListenerTest {
         TestOutcome testOutcome = new TestOutcome("failedScenario");
         testOutcome.setUserStory(STORY);
         testOutcome.recordStep(TestStepFactory.getErrorTestStep("Failed scenario step", THROWABLE));
-        testOutcome.setTestFailureCause(THROWABLE);
+        TestOutcome mockedTestOutcome = spy(testOutcome);
+        doReturn(THROWABLE).when(mockedTestOutcome).getTestFailureCause();
 
-        teamCityStepListener.testFinished(testOutcome);
+        teamCityStepListener.testFinished(mockedTestOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
         String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
@@ -222,6 +250,151 @@ public class TeamCityStepListenerTest {
     }
 
     @Test
+    public void testParametrisedFailedScenario() {
+
+        teamCityStepListener.exampleStarted(new HashMap<String, String>() {{
+            put("value", "exampleTableValue");
+        }});
+
+        TestOutcome testOutcome = new TestOutcome("parametrisedScenario");
+        testOutcome.useExamplesFrom(dataTable);
+        testOutcome.setUserStory(STORY);
+
+        TestStep testStep1 = TestStepFactory.getFailureTestStep("[1] {value=exampleTableValue");
+        testStep1.addChildStep(TestStepFactory.getFailureTestStep("Failed scenario child step", THROWABLE));
+        testOutcome.recordStep(testStep1);
+
+        teamCityStepListener.testFinished(testOutcome);
+
+        String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  details='Steps:|r|nFailed scenario child step (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(3)).info(stringArgumentCaptor.capture());
+
+        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testFailedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(2), is(testFinishedExpectedMessage));
+    }
+
+    @Test
+    public void testParametrisedErrorScenario() {
+
+        teamCityStepListener.exampleStarted(new HashMap<String, String>() {{
+            put("value", "exampleTableValue");
+        }});
+
+        TestOutcome testOutcome = new TestOutcome("parametrisedScenario");
+        testOutcome.useExamplesFrom(dataTable);
+        testOutcome.setUserStory(STORY);
+
+        TestStep testStep = TestStepFactory.getErrorTestStep("[1] {value=exampleTableValue");
+        testStep.addChildStep(TestStepFactory.getErrorTestStep("Failed scenario child step", THROWABLE));
+        testOutcome.recordStep(testStep);
+
+        teamCityStepListener.testFinished(testOutcome);
+
+        String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testErrorExpectedMessage = "##teamcity[testFailed  details='Steps:|r|nFailed scenario child step (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(3)).info(stringArgumentCaptor.capture());
+
+        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testErrorExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(2), is(testFinishedExpectedMessage));
+    }
+
+    @Test
+    public void testParametrisedSkippedScenario() {
+
+        teamCityStepListener.exampleStarted(new HashMap<String, String>() {{
+            put("value", "exampleTableValue");
+        }});
+
+        TestOutcome testOutcome = new TestOutcome("parametrisedScenario");
+        testOutcome.useExamplesFrom(dataTable);
+        testOutcome.setUserStory(STORY);
+
+        TestStep testStep = TestStepFactory.getSkippedTestStep("[1] {value=exampleTableValue");
+        testStep.addChildStep(TestStepFactory.getSkippedTestStep("Failed scenario child step"));
+        testOutcome.recordStep(testStep);
+
+        teamCityStepListener.testFinished(testOutcome);
+
+        String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testSkippedExpectedMessage = "##teamcity[testIgnored  name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(3)).info(stringArgumentCaptor.capture());
+
+        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testSkippedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(2), is(testFinishedExpectedMessage));
+    }
+
+    @Test
+    public void testParametrisedPendingScenario() {
+
+        teamCityStepListener.exampleStarted(new HashMap<String, String>() {{
+            put("value", "exampleTableValue");
+        }});
+
+        TestOutcome testOutcome = new TestOutcome("parametrisedScenario");
+        testOutcome.useExamplesFrom(dataTable);
+        testOutcome.setUserStory(STORY);
+
+        TestStep testStep = TestStepFactory.getPendingTestStep("[1] {value=exampleTableValue");
+        testStep.addChildStep(TestStepFactory.getPendingTestStep("Failed scenario child step"));
+        testOutcome.recordStep(testStep);
+
+        teamCityStepListener.testFinished(testOutcome);
+
+        String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testPendingExpectedMessage = "##teamcity[testIgnored  name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(3)).info(stringArgumentCaptor.capture());
+
+        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testPendingExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(2), is(testFinishedExpectedMessage));
+    }
+
+    @Test
+    public void testParametrisedIgnoredScenario() {
+
+        teamCityStepListener.exampleStarted(new HashMap<String, String>() {{
+            put("value", "exampleTableValue");
+        }});
+
+        TestOutcome testOutcome = new TestOutcome("parametrisedScenario");
+        testOutcome.useExamplesFrom(dataTable);
+        testOutcome.setUserStory(STORY);
+
+        TestStep testStep = TestStepFactory.getIgnoredTestStep("[1] {value=exampleTableValue");
+        testStep.addChildStep(TestStepFactory.getIgnoredTestStep("Failed scenario child step"));
+        testOutcome.recordStep(testStep);
+
+        teamCityStepListener.testFinished(testOutcome);
+
+        String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testPendingExpectedMessage = "##teamcity[testIgnored  name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(3)).info(stringArgumentCaptor.capture());
+
+        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testPendingExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(2), is(testFinishedExpectedMessage));
+    }
+
+    @Test
     public void testEscapingSymbols() {
 
         TestOutcome testOutcome = new TestOutcome("\\|'\n\r\\[\\][]");
@@ -233,7 +406,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.|||'|n|r||[||]|[|]']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='|||'|n|r||[||]|[|]' details='Steps:|r|n|||'|n|r||[||]|[|] (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.|||'|n|r||[||]|[|]']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='|||'|n|r||[||]|[|]' details='Steps:|r|n|||'|n|r||[||]|[|] (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.|||'|n|r||[||]|[|]']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.|||'|n|r||[||]|[|]']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -255,7 +428,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
