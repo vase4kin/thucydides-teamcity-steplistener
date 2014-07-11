@@ -536,7 +536,7 @@ public class TeamCityStepListenerTest {
 
         teamCityStepListener.testFinished(testOutcome);
 
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nChildren Steps:|r|nAuthorization: {7a16bec9-96e2-46b4-824a-5e98662a8af3, password} (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|nChildren Steps:|r|nAuthorization: {7a16bec9-96e2-46b4-824a-5e98662a8af3, password} (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(logger, times(3)).info(stringArgumentCaptor.capture());
@@ -556,7 +556,7 @@ public class TeamCityStepListenerTest {
 
         teamCityStepListener.testFinished(testOutcome);
 
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nChildren Steps:|r|nExact check error messages:|r|n| error message ||r|n| Логин и пароль не должны совпадать | (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|nChildren Steps:|r|nExact check error messages:|r|n| error message ||r|n| Логин и пароль не должны совпадать | (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(logger, times(3)).info(stringArgumentCaptor.capture());
@@ -576,7 +576,7 @@ public class TeamCityStepListenerTest {
 
         teamCityStepListener.testFinished(testOutcome);
 
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nChildren Steps:|r|nExact check error messages:|r|n| choose your destiny ||r|n| apple ||r|n| snake ||r|n| none | (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|nChildren Steps:|r|nExact check error messages:|r|n| choose your destiny ||r|n| apple ||r|n| snake ||r|n| none | (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(logger, times(3)).info(stringArgumentCaptor.capture());
