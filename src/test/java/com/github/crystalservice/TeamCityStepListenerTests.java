@@ -350,4 +350,64 @@ public class TeamCityStepListenerTests {
         assertThat(stringArgumentCaptor.getAllValues().get(4), is(testFinishedExpectedMessage2));
         assertThat(stringArgumentCaptor.getAllValues().get(5), is(testSuiteFinishedExpectedMessage));
     }
+
+    @Test
+    public void testJBehaveFormattedChildTestStepDescription() {
+
+        TestOutcome testOutcome = new TestOutcome("failedScenario");
+        testOutcome.setUserStory(STORY);
+        TestStep testStep = TestStepFactory.getFailureTestStep("Failed scenario step");
+        testStep.addChildStep(TestStepFactory.getFailureTestStep("Authorization: <span class='step-parameter'>7a16bec9-96e2-46b4-824a-5e98662a8af3, password</span>", THROWABLE));
+        testOutcome.recordStep(testStep);
+        testOutcome.setTestFailureCause(THROWABLE);
+
+        teamCityStepListener.testFinished(testOutcome);
+
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nChildren Steps:|r|nAuthorization: {7a16bec9-96e2-46b4-824a-5e98662a8af3, password} (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(3)).info(stringArgumentCaptor.capture());
+
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testFailedExpectedMessage));
+    }
+
+    @Test
+    public void testExamplesTableJBehaveFormattedChildTestStepDescription() {
+
+        TestOutcome testOutcome = new TestOutcome("failedScenario");
+        testOutcome.setUserStory(STORY);
+        TestStep testStep = TestStepFactory.getFailureTestStep("Failed scenario step");
+        testStep.addChildStep(TestStepFactory.getFailureTestStep("Exact check error messages: <span class='step-parameter'>ExamplesTable[tableAsString=| error message |n| Логин и пароль не должны совпадать |,headerSeparator=|,valueSeparator=|,ignorableSeparator=|--,parameterConverters=org.jbehave.core.steps.ParameterConverters@3c0920e0,tableTransformers=org.jbehave.core.model.TableTransformers@7b4d70ea,headers=[error message],data=[{error message=Логин и пароль не должны совпадать}],properties={headerSeparator=|, valueSeparator=|, ignorableSeparator=|--},propertiesAsString=,namedParameters={id_s36u77s10=, id_s36u77s6=, id_s36u77s7=, us_77=, sprint_36=, id_s36u77s8=, id_s36u77s9=, id_s36u77s11=},trim=true,defaults=org.jbehave.core.steps.ConvertedParameters@2f7e77fc]</span>", THROWABLE));
+        testOutcome.recordStep(testStep);
+        testOutcome.setTestFailureCause(THROWABLE);
+
+        teamCityStepListener.testFinished(testOutcome);
+
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nChildren Steps:|r|nExact check error messages:|r|n| error message ||r|n| Логин и пароль не должны совпадать | (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(3)).info(stringArgumentCaptor.capture());
+
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testFailedExpectedMessage));
+    }
+
+    @Test
+    public void testExamplesTableWithMoreThenOneValueJBehaveFormattedChildTestStepDescription() {
+
+        TestOutcome testOutcome = new TestOutcome("failedScenario");
+        testOutcome.setUserStory(STORY);
+        TestStep testStep = TestStepFactory.getFailureTestStep("Failed scenario step");
+        testStep.addChildStep(TestStepFactory.getFailureTestStep("Exact check error messages: <span class='step-parameter'>ExamplesTable[tableAsString=| choose your destiny |n| apple |n| snake |n| none |,headerSeparator=|,valueSeparator=|,ignorableSeparator=|--,parameterConverters=org.jbehave.core.steps.ParameterConverters@3c0920e0,tableTransformers=org.jbehave.core.model.TableTransformers@7b4d70ea,headers=[error message],data=[{error message=Логин и пароль не должны совпадать}],properties={headerSeparator=|, valueSeparator=|, ignorableSeparator=|--},propertiesAsString=,namedParameters={id_s36u77s10=, id_s36u77s6=, id_s36u77s7=, us_77=, sprint_36=, id_s36u77s8=, id_s36u77s9=, id_s36u77s11=},trim=true,defaults=org.jbehave.core.steps.ConvertedParameters@2f7e77fc]</span>", THROWABLE));
+        testOutcome.recordStep(testStep);
+        testOutcome.setTestFailureCause(THROWABLE);
+
+        teamCityStepListener.testFinished(testOutcome);
+
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nChildren Steps:|r|nExact check error messages:|r|n| choose your destiny ||r|n| apple ||r|n| snake ||r|n| none | (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(3)).info(stringArgumentCaptor.capture());
+
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testFailedExpectedMessage));
+    }
 }

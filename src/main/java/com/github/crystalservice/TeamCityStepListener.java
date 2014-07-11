@@ -173,7 +173,11 @@ public class TeamCityStepListener implements StepListener {
     private String getStepsInfo(List<TestStep> testSteps) {
         StringBuilder builder = new StringBuilder("Steps:\r\n");
         for (TestStep testStep : testSteps) {
-            String stepMessage = String.format("%s (%s) -> %s\r\n", testStep.getDescription(), testStep.getDurationInSeconds(), getResultMessage(testStep));
+            String stepMessage = String.format(
+                    "%s (%s) -> %s\r\n",
+                    TestDescriptionFormatter.formatTestDescription(testStep.getDescription()),
+                    testStep.getDurationInSeconds(),
+                    getResultMessage(testStep));
             builder.append(stepMessage);
         }
         return builder.append("\r\n").toString();
