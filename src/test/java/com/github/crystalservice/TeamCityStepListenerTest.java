@@ -5,6 +5,8 @@ import net.thucydides.core.model.DataTable;
 import net.thucydides.core.model.Story;
 import net.thucydides.core.model.TestOutcome;
 import net.thucydides.core.model.TestStep;
+import net.thucydides.core.steps.ExecutedStepDescription;
+import net.thucydides.core.steps.StepFailure;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -36,6 +38,8 @@ public class TeamCityStepListenerTest {
     private static final String STORY_PATH = "stories/sprint-1/us-1/story.story";
     private static final Story STORY = Story.withIdAndPath("storyId", "Test story", STORY_PATH);
     private static final Throwable THROWABLE = new Throwable("the test is failed!");
+    private static final ExecutedStepDescription EXECUTED_STEP_DESCRIPTION = ExecutedStepDescription.withTitle("step");
+    private static final StepFailure STEP_FAILURE = new StepFailure(EXECUTED_STEP_DESCRIPTION, THROWABLE);
 
     @Before
     public void before() {
@@ -569,8 +573,7 @@ public class TeamCityStepListenerTest {
 
         teamCityStepListener.testFinished(testOutcome);
 
-        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        verify(logger, times(0)).info(stringArgumentCaptor.capture());
+        verifyArgumentCaptorCapturesNoLoggerMessages();
     }
 
     @Test
@@ -653,5 +656,122 @@ public class TeamCityStepListenerTest {
         assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
         assertThat(stringArgumentCaptor.getAllValues().get(1), is(testFailedExpectedMessage));
         assertThat(stringArgumentCaptor.getAllValues().get(2), is(testFinishedExpectedMessage));
+    }
+
+    @Test
+    public void testTestStartedMethodNoLoggerMessage() {
+
+        teamCityStepListener.testStarted("test");
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testTestRetriedMethodNoLoggerMessage() {
+
+        teamCityStepListener.testRetried();
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testTestIgnoredMethodNoLoggerMessage() {
+
+        teamCityStepListener.testIgnored();
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testTestFailedMethodNoLoggerMessage() {
+
+        teamCityStepListener.testFailed(new TestOutcome("test outcome"), THROWABLE);
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testStepStartedMethodNoLoggerMessage() {
+
+        teamCityStepListener.stepStarted(EXECUTED_STEP_DESCRIPTION);
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testSkippedStepStartedMethodNoLoggerMessage() {
+
+        teamCityStepListener.skippedStepStarted(EXECUTED_STEP_DESCRIPTION);
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testStepFailedMethodNoLoggerMessage() {
+
+        teamCityStepListener.stepFailed(STEP_FAILURE);
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testLastStepFailedMethodNoLoggerMessage() {
+
+        teamCityStepListener.lastStepFailed(STEP_FAILURE);
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testStepIgnoredMethodNoLoggerMessage() {
+
+        teamCityStepListener.stepIgnored();
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testStepPendingMethodNoLoggerMessage() {
+
+        teamCityStepListener.stepPending();
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testStepPendingWithMessageMethodNoLoggerMessage() {
+
+        teamCityStepListener.stepPending("pending");
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testStepFinishedMethodNoLoggerMessage() {
+
+        teamCityStepListener.stepFinished();
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testNotifyScreenChangeMethodNoLoggerMessage() {
+
+        teamCityStepListener.notifyScreenChange();
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testUseExamplesFromMethodNoLoggerMessage() {
+
+        teamCityStepListener.useExamplesFrom(dataTable);
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testExampleFinishedMethodNoLoggerMessage() {
+
+        teamCityStepListener.exampleFinished();
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testAssumptionViolatedMethodNoLoggerMessage() {
+
+        teamCityStepListener.assumptionViolated("message");
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    private void verifyArgumentCaptorCapturesNoLoggerMessages() {
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, never()).info(stringArgumentCaptor.capture());
     }
 }
