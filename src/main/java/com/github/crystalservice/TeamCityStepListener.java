@@ -1,13 +1,9 @@
 package com.github.crystalservice;
 
-import net.thucydides.core.model.DataTable;
-import net.thucydides.core.model.Story;
-import net.thucydides.core.model.TestOutcome;
-import net.thucydides.core.model.TestStep;
+import net.thucydides.core.model.*;
 import net.thucydides.core.steps.ExecutedStepDescription;
 import net.thucydides.core.steps.StepFailure;
 import net.thucydides.core.steps.StepListener;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +16,8 @@ public class TeamCityStepListener implements StepListener {
 
     private static final String MESSAGE_TEMPLATE = "##teamcity[%s %s]";
     private static final String PROPERTY_TEMPLATE = " %s='%s'";
+
+    private static final String EMPTY_STRING = "";
 
     private static final HashMap<String, String> ESCAPE_CHARS = new LinkedHashMap<String, String>() {
         {
@@ -45,7 +43,7 @@ public class TeamCityStepListener implements StepListener {
         this.logger = logger;
     }
 
-    private String currentTestSuiteName = "";
+    private String currentTestSuiteName = EMPTY_STRING;
 
     public TeamCityStepListener() {
         this(LoggerFactory.getLogger(TeamCityStepListener.class));
@@ -140,10 +138,12 @@ public class TeamCityStepListener implements StepListener {
         printMessage("testFailed", properties);
     }
 
-    private String getTestOutComeTestFailureCauseMessage(Throwable throwable) {
-        return throwable != null && !(throwable instanceof NullPointerException)
-                ? throwable.getMessage()
-                : "";
+    private String getTestOutComeTestFailureCauseMessage(FailureCause failureCause) {
+        if (failureCause != null && failureCause.getMessage() != null) {
+            return failureCause.getMessage();
+        } else {
+            return EMPTY_STRING;
+        }
     }
 
     private void printExampleResults(TestOutcome result) {
@@ -211,7 +211,9 @@ public class TeamCityStepListener implements StepListener {
             if (testStep.isAGroup()) {
                 exceptionCause = "Children " + getStepsInfo(testStep.getChildren());
             } else {
-                exceptionCause = testStep.getException() != null ? getStackTrace(testStep.getException().getCause()) : "";
+                exceptionCause = testStep.getException() != null
+                        ? getStackTrace(testStep.getException().getStackTrace())
+                        : EMPTY_STRING;
             }
             builder.append(
                     String.format("\r\n\n%s", exceptionCause)
@@ -220,8 +222,8 @@ public class TeamCityStepListener implements StepListener {
         return builder.toString();
     }
 
-    protected String getStackTrace(Throwable throwable) {
-        return ExceptionUtils.getStackTrace(throwable);
+    protected String getStackTrace(StackTraceElement[] stackTraceElements) {
+        return Arrays.toString(stackTraceElements);
     }
 
     private String getResultTitle(TestOutcome result) {
