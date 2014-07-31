@@ -19,21 +19,8 @@ Simply add a dependency to your project's pom file:
         <dependency>
             <groupId>com.github.crystalservice</groupId>
             <artifactId>thucydides-teamcity-steplistener</artifactId>
-            <version>0.3.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-lang</groupId>
-                    <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.thucydides</groupId>
-                    <artifactId>thucydides-core</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>0.3.3</version>
         </dependency>
-
-######The exclusion for thucydides-core is temporarily workaround for running `thucydides-teamcity-steplistener` on latest [Thucydides](http://thucydides.info/) version. Latest [Thucydides](http://thucydides.info/) version had TestOutCome class changes, which affected `thucydides-teamcity-steplistener`. It will be fixed in next release.  
-        
         
 ####JBehave:
         

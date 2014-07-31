@@ -1,10 +1,7 @@
 package com.github.crystalservice;
 
 import junit.framework.TestCase;
-import net.thucydides.core.model.DataTable;
-import net.thucydides.core.model.Story;
-import net.thucydides.core.model.TestOutcome;
-import net.thucydides.core.model.TestStep;
+import net.thucydides.core.model.*;
 import net.thucydides.core.steps.ExecutedStepDescription;
 import net.thucydides.core.steps.StepFailure;
 import org.junit.Before;
@@ -18,7 +15,6 @@ import java.util.HashMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -33,6 +29,9 @@ public class TeamCityStepListenerTest {
     @Mock
     private DataTable dataTable;
 
+    @Mock
+    private FailureCause failureCause;
+
     private TeamCityStepListener teamCityStepListener;
 
     private static final String STORY_PATH = "stories/sprint-1/us-1/story.story";
@@ -45,7 +44,8 @@ public class TeamCityStepListenerTest {
     public void before() {
         initMocks(this);
         teamCityStepListener = spy(new TeamCityStepListener(logger));
-        doReturn("StackTrace").when(teamCityStepListener).getStackTrace(any(Throwable.class));
+        doReturn("StackTrace").when(teamCityStepListener).getStackTrace(any(StackTraceElement[].class));
+        when(failureCause.getMessage()).thenReturn("the test is failed!");
     }
 
     @Test
@@ -71,8 +71,8 @@ public class TeamCityStepListenerTest {
 
         TestOutcome testOutcome = new TestOutcome("failedScenario");
         testOutcome.setUserStory(STORY);
-        testOutcome.recordStep(TestStepFactory.getFailureTestStep("Failed scenario step", THROWABLE));
-        testOutcome.setTestFailureCause(THROWABLE);
+        testOutcome.recordStep(TestStepFactory.getFailureTestStepWithAssertionError("Failed scenario step"));
+        testOutcome.setTestFailureCause(failureCause);
 
         teamCityStepListener.testFinished(testOutcome);
 
@@ -115,9 +115,9 @@ public class TeamCityStepListenerTest {
         TestOutcome testOutcome = new TestOutcome("failedScenario");
         testOutcome.setUserStory(STORY);
         TestStep testStep = TestStepFactory.getErrorTestStep("Failed scenario step");
-        testStep.addChildStep(TestStepFactory.getErrorTestStep("Failed scenario child step", THROWABLE));
+        testStep.addChildStep(TestStepFactory.getErrorTestStepWithThrowable("Failed scenario child step"));
         testOutcome.recordStep(testStep);
-        testOutcome.setTestFailureCause(THROWABLE);
+        testOutcome.setTestFailureCause(failureCause);
 
         teamCityStepListener.testFinished(testOutcome);
 
@@ -139,9 +139,9 @@ public class TeamCityStepListenerTest {
         TestOutcome testOutcome = new TestOutcome("failedScenario");
         testOutcome.setUserStory(STORY);
         TestStep testStep = TestStepFactory.getFailureTestStep("Failed scenario step");
-        testStep.addChildStep(TestStepFactory.getFailureTestStep("Failed scenario child step", THROWABLE));
+        testStep.addChildStep(TestStepFactory.getFailureTestStepWithAssertionError("Failed scenario child step"));
         testOutcome.recordStep(testStep);
-        testOutcome.setTestFailureCause(THROWABLE);
+        testOutcome.setTestFailureCause(failureCause);
 
         teamCityStepListener.testFinished(testOutcome);
 
@@ -162,8 +162,8 @@ public class TeamCityStepListenerTest {
 
         TestOutcome testOutcome = new TestOutcome("failedScenario");
         testOutcome.setUserStory(STORY);
-        testOutcome.recordStep(TestStepFactory.getErrorTestStep("Failed scenario step", THROWABLE));
-        testOutcome.setTestFailureCause(THROWABLE);
+        testOutcome.recordStep(TestStepFactory.getErrorTestStepWithThrowable("Failed scenario step"));
+        testOutcome.setTestFailureCause(failureCause);
 
         teamCityStepListener.testFinished(testOutcome);
 
@@ -283,7 +283,7 @@ public class TeamCityStepListenerTest {
         testOutcome.setUserStory(STORY);
 
         TestStep testStep1 = TestStepFactory.getFailureTestStep("[1] {value=exampleTableValue");
-        testStep1.addChildStep(TestStepFactory.getFailureTestStep("Failed scenario child step", THROWABLE));
+        testStep1.addChildStep(TestStepFactory.getFailureTestStepWithAssertionError("Failed scenario child step"));
         testOutcome.recordStep(testStep1);
 
         teamCityStepListener.testFinished(testOutcome);
@@ -312,7 +312,7 @@ public class TeamCityStepListenerTest {
         testOutcome.setUserStory(STORY);
 
         TestStep testStep = TestStepFactory.getErrorTestStep("[1] {value=exampleTableValue");
-        testStep.addChildStep(TestStepFactory.getErrorTestStep("Failed scenario child step", THROWABLE));
+        testStep.addChildStep(TestStepFactory.getErrorTestStepWithThrowable("Failed scenario child step"));
         testOutcome.recordStep(testStep);
 
         teamCityStepListener.testFinished(testOutcome);
@@ -421,9 +421,12 @@ public class TeamCityStepListenerTest {
 
         TestOutcome testOutcome = new TestOutcome("\\|'\n\r\\[\\][]");
         testOutcome.setUserStory(STORY);
-        Throwable throwable = new Throwable("\\|'\n\r\\[\\][]");
-        testOutcome.recordStep(TestStepFactory.getFailureTestStep("\\|'\n\r\\[\\][]", throwable));
-        testOutcome.setTestFailureCause(throwable);
+        testOutcome.recordStep(TestStepFactory.getFailureTestStepWithAssertionError("\\|'\n\r\\[\\][]"));
+
+        FailureCause failureCause = mock(FailureCause.class);
+        when(failureCause.getMessage()).thenReturn("\\|'\n\r\\[\\][]");
+
+        testOutcome.setTestFailureCause(failureCause);
 
         teamCityStepListener.testFinished(testOutcome);
 
@@ -440,17 +443,25 @@ public class TeamCityStepListenerTest {
     }
 
     @Test
-    public void messagePropertyIsNullIfResultHasTestFailureCauseInstanceOfNPE() {
+    public void testMessagePropertyCantBeNullIfResultHasTestFailureCauseInstanceOfNPE() {
 
         TestOutcome testOutcome = new TestOutcome("failedScenario");
         testOutcome.setUserStory(STORY);
-        testOutcome.recordStep(TestStepFactory.getFailureTestStep("Failed scenario step", new NullPointerException()));
-        testOutcome.setTestFailureCause(new NullPointerException());
+        testOutcome.recordStep(TestStepFactory.getErrorTestStepWithThrowable("Failed scenario step", new NullPointerException()));
+
+        FailureCause failureCause = mock(FailureCause.class);
+
+        NullPointerException nullPointerException = new NullPointerException();
+        when(failureCause.getStackTrace()).thenReturn(null);
+        when(failureCause.getMessage()).thenReturn(null);
+        when(failureCause.getErrorType()).thenReturn(nullPointerException.getClass().getName());
+
+        testOutcome.setTestFailureCause(failureCause);
 
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -548,8 +559,9 @@ public class TeamCityStepListenerTest {
 
     @Test
     public void testGetStackTraceMethod() {
-        assertThat(new TeamCityStepListener().getStackTrace(THROWABLE), containsString("java.lang.Throwable: the test is failed!"));
-        assertThat(new TeamCityStepListener().getStackTrace(THROWABLE), containsString("com.github.crystalservice.TeamCityStepListenerTest.<clinit>(TeamCityStepListenerTest.java:"));
+
+        StackTraceElement STACK_TRACE_ELEMENT = new StackTraceElement("declaringClass", "methodName", "fileName", 1);
+        assertThat(new TeamCityStepListener().getStackTrace(new StackTraceElement[] {STACK_TRACE_ELEMENT}), containsString("[declaringClass.methodName(fileName:1)]"));
     }
 
     @Test
@@ -584,7 +596,7 @@ public class TeamCityStepListenerTest {
 
         TestOutcome testOutcome = new TestOutcome("failedScenario");
         testOutcome.setUserStory(STORY);
-        testOutcome.recordStep(TestStepFactory.getFailureTestStep("Failed scenario step", THROWABLE));
+        testOutcome.recordStep(TestStepFactory.getFailureTestStepWithAssertionError("Failed scenario step"));
         testOutcome.setTestFailureCause(null);
 
         teamCityStepListener.testFinished(testOutcome);
@@ -609,12 +621,12 @@ public class TeamCityStepListenerTest {
 
         TestOutcome testOutcome = new TestOutcome("failedScenario");
         testOutcome.setUserStory(STORY);
-        TestStep testStep = spy(TestStepFactory.getFailureTestStep("Failed scenario step", THROWABLE));
+        TestStep testStep = spy(TestStepFactory.getFailureTestStepWithAssertionError("Failed scenario step"));
         doReturn(false).when(testStep).isError();
         doReturn(false).when(testStep).isFailure();
 
         testOutcome.recordStep(testStep);
-        testOutcome.setTestFailureCause(THROWABLE);
+        testOutcome.setTestFailureCause(failureCause);
 
         teamCityStepListener.testFinished(testOutcome);
 
@@ -638,11 +650,11 @@ public class TeamCityStepListenerTest {
 
         TestOutcome testOutcome = new TestOutcome("failedScenario");
         testOutcome.setUserStory(STORY);
-        TestStep testStep = spy(TestStepFactory.getFailureTestStep("Failed scenario step", THROWABLE));
+        TestStep testStep = spy(TestStepFactory.getFailureTestStepWithAssertionError("Failed scenario step"));
         doReturn(null).when(testStep).getException();
 
         testOutcome.recordStep(testStep);
-        testOutcome.setTestFailureCause(THROWABLE);
+        testOutcome.setTestFailureCause(failureCause);
 
         teamCityStepListener.testFinished(testOutcome);
 
