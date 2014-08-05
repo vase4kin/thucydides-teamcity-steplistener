@@ -44,7 +44,7 @@ public class TeamCityStepListenerTest {
     public void before() {
         initMocks(this);
         teamCityStepListener = spy(new TeamCityStepListener(logger));
-        doReturn("StackTrace").when(teamCityStepListener).getStackTrace(any(StackTraceElement[].class));
+        doReturn("StackTrace").when(teamCityStepListener).getStackTrace(any(Throwable.class));
         when(failureCause.getMessage()).thenReturn("the test is failed!");
     }
 
@@ -77,7 +77,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|nStackTrace|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -122,7 +122,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nChildren Steps:|r|nFailed scenario child step (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|nChildren Steps:|r|nFailed scenario child step (0.1) -> ERROR|r|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -146,7 +146,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|nChildren Steps:|r|nFailed scenario child step (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|nChildren Steps:|r|nFailed scenario child step (0.1) -> FAILURE|r|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -168,7 +168,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|nStackTrace|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -289,7 +289,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  details='Steps:|r|nFailed scenario child step (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  details='Steps:|r|nFailed scenario child step (0.1) -> FAILURE|r|nStackTrace|r|n' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -318,7 +318,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
-        String testErrorExpectedMessage = "##teamcity[testFailed  details='Steps:|r|nFailed scenario child step (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
+        String testErrorExpectedMessage = "##teamcity[testFailed  details='Steps:|r|nFailed scenario child step (0.1) -> ERROR|r|nStackTrace|r|n' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.parametrisedScenario.{value=exampleTableValue}']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -431,7 +431,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.|||'|n|r||[||]|[|]']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='|||'|n|r||[||]|[|]' details='Steps:|r|n|||'|n|r||[||]|[|] (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.|||'|n|r||[||]|[|]']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='|||'|n|r||[||]|[|]' details='Steps:|r|n|||'|n|r||[||]|[|] (0.1) -> FAILURE|r|nStackTrace|r|n' name='sprint-1.us-1.story.|||'|n|r||[||]|[|]']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.|||'|n|r||[||]|[|]']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -461,7 +461,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='' details='Steps:|r|nFailed scenario step (0.1) -> ERROR|r|nStackTrace|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -560,8 +560,8 @@ public class TeamCityStepListenerTest {
     @Test
     public void testGetStackTraceMethod() {
 
-        StackTraceElement STACK_TRACE_ELEMENT = new StackTraceElement("declaringClass", "methodName", "fileName", 1);
-        assertThat(new TeamCityStepListener().getStackTrace(new StackTraceElement[] {STACK_TRACE_ELEMENT}), containsString("[declaringClass.methodName(fileName:1)]"));
+        assertThat(new TeamCityStepListener().getStackTrace(THROWABLE), containsString("java.lang.Throwable: the test is failed!"));
+        assertThat(new TeamCityStepListener().getStackTrace(THROWABLE), containsString("com.github.crystalservice.TeamCityStepListenerTest.<clinit>(TeamCityStepListenerTest.java:"));
     }
 
     @Test
@@ -602,7 +602,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|nStackTrace|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|nStackTrace|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -631,7 +631,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -659,7 +659,7 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testFinished(testOutcome);
 
         String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario']";
-        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|n|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|n|r|n' name='sprint-1.us-1.story.failedScenario']";
         String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario']";
 
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
