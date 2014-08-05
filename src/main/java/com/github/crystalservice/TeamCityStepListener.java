@@ -7,6 +7,8 @@ import net.thucydides.core.steps.StepListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
 
 import static ch.lambdaj.Lambda.on;
@@ -182,7 +184,7 @@ public class TeamCityStepListener implements StepListener {
             String stepMessage = String.format("%s (%s) -> %s\r\n", testStep.getDescription(), testStep.getDurationInSeconds(), getResultMessage(testStep));
             builder.append(stepMessage);
         }
-        return builder.append("\r\n").toString();
+        return builder.toString();
     }
 
     private Boolean hasFailureStep(List<TestStep> testSteps) {
@@ -207,23 +209,26 @@ public class TeamCityStepListener implements StepListener {
         StringBuilder builder = new StringBuilder();
         builder.append(testStep.getResult().toString());
         if (testStep.isFailure() || testStep.isError()) {
-            String exceptionCause;
+            String exceptionCauseStackTrace;
             if (testStep.isAGroup()) {
-                exceptionCause = "Children " + getStepsInfo(testStep.getChildren());
+                exceptionCauseStackTrace = "Children " + getStepsInfo(testStep.getChildren());
             } else {
-                exceptionCause = testStep.getException() != null
-                        ? getStackTrace(testStep.getException().getStackTrace())
+                exceptionCauseStackTrace = testStep.getException() != null
+                        ? getStackTrace(testStep.getException().toException())
                         : EMPTY_STRING;
             }
             builder.append(
-                    String.format("\r\n\n%s", exceptionCause)
+                    String.format("\r\n%s", exceptionCauseStackTrace)
             );
         }
         return builder.toString();
     }
 
-    protected String getStackTrace(StackTraceElement[] stackTraceElements) {
-        return Arrays.toString(stackTraceElements);
+    protected String getStackTrace(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        return sw.toString().trim();
     }
 
     private String getResultTitle(TestOutcome result) {
