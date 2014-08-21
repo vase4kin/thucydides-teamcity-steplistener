@@ -105,8 +105,10 @@ public class TeamCityStepListener implements StepListener {
 
     @Override
     public void testSuiteFinished() {
-        String suiteName = suiteStack.pop();
-        printTestSuiteFinished(suiteName);
+        if (!suiteStack.empty()) {
+            String suiteName = suiteStack.pop();
+            printTestSuiteFinished(suiteName);
+        }
     }
 
     @Override
