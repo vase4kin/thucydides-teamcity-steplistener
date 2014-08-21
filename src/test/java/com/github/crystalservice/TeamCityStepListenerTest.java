@@ -782,6 +782,14 @@ public class TeamCityStepListenerTest {
         verifyArgumentCaptorCapturesNoLoggerMessages();
     }
 
+    @Test
+    public void testSuiteFinishedMethodInvokesTwoTimesAfterTestStoryFinished() {
+
+        teamCityStepListener.testSuiteStarted(STORY);
+        teamCityStepListener.testSuiteFinished();
+        teamCityStepListener.testSuiteFinished();
+    }
+
     private void verifyArgumentCaptorCapturesNoLoggerMessages() {
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(logger, never()).info(stringArgumentCaptor.capture());
