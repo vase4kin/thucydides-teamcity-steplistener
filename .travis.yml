@@ -1,5 +1,11 @@
 language: java
 
+# testing against multiple jdks
+jdk:
+  - oraclejdk8
+  - oraclejdk7
+  - openjdk7
+
 # need to override travis 'install' since it will try gpg sign and fail.
 install: mvn clean package -DskipTests=true
 
