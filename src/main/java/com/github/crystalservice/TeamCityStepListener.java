@@ -292,6 +292,14 @@ public class TeamCityStepListener implements StepListener {
     }
 
     @Override
+    public void testSkipped() {
+    }
+
+    @Override
+    public void testPending() {
+    }
+
+    @Override
     public void stepStarted(ExecutedStepDescription description) {
     }
 
