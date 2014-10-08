@@ -8,7 +8,7 @@
     </parent>
     <groupId>com.github.crystalservice</groupId>
     <artifactId>thucydides-teamcity-steplistener</artifactId>
-    <version>0.3.6-SNAPSHOT</version>
+    <version>0.3.6</version>
     <packaging>jar</packaging>
     <name>Thucydides teamCity stepListener</name>
     <description>Provide fast and easy test reporting during team city build process</description>
