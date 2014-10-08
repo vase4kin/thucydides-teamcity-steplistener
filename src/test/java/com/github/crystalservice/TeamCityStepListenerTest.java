@@ -790,6 +790,20 @@ public class TeamCityStepListenerTest {
         teamCityStepListener.testSuiteFinished();
     }
 
+    @Test
+    public void testSkippedMethodNoLoggerMessage() {
+
+        teamCityStepListener.testSkipped();
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testPendingMethodNoLoggerMessage() {
+
+        teamCityStepListener.testPending();
+        verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
     private void verifyArgumentCaptorCapturesNoLoggerMessages() {
         ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(logger, never()).info(stringArgumentCaptor.capture());
