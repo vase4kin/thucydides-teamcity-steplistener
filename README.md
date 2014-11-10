@@ -19,7 +19,7 @@ Simply add a dependency to your project's pom file:
         <dependency>
             <groupId>com.github.crystalservice</groupId>
             <artifactId>thucydides-teamcity-steplistener</artifactId>
-            <version>0.3.6</version>
+            <version>0.3.7</version>
         </dependency>
         
 ####JBehave:
