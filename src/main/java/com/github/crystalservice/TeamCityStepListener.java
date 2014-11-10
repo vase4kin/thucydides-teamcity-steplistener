@@ -16,6 +16,8 @@ import static ch.lambdaj.Lambda.sum;
 
 public class TeamCityStepListener implements StepListener {
 
+    private final String FLOW_ID = System.getProperty("teamcity.flowId");
+
     private static final String MESSAGE_TEMPLATE = "##teamcity[%s %s]";
     private static final String PROPERTY_TEMPLATE = " %s='%s'";
 
@@ -60,6 +62,9 @@ public class TeamCityStepListener implements StepListener {
 
     private void printMessage(String messageName, Map<String, String> properties) {
         StringBuilder propertiesBuilder = new StringBuilder();
+        if (FLOW_ID != null) {
+            properties.put("flowId", FLOW_ID);
+        }
         for (Map.Entry<String, String> property : properties.entrySet()) {
             propertiesBuilder.append(
                     String.format(

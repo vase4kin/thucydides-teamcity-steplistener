@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import net.thucydides.core.model.*;
 import net.thucydides.core.steps.ExecutedStepDescription;
 import net.thucydides.core.steps.StepFailure;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -46,6 +47,11 @@ public class TeamCityStepListenerTest {
         teamCityStepListener = spy(new TeamCityStepListener(logger));
         doReturn("StackTrace").when(teamCityStepListener).getStackTrace(any(Throwable.class));
         when(failureCause.getMessage()).thenReturn("the test is failed!");
+    }
+
+    @After
+    public void after() {
+        System.clearProperty("teamcity.flowId");
     }
 
     @Test
@@ -802,6 +808,34 @@ public class TeamCityStepListenerTest {
 
         teamCityStepListener.testPending();
         verifyArgumentCaptorCapturesNoLoggerMessages();
+    }
+
+    @Test
+    public void testFlowIdProperty() {
+
+        //setting team city flow id number
+        System.setProperty("teamcity.flowId", "1");
+
+        //init again teamcity step listener
+        before();
+
+        TestOutcome testOutcome = new TestOutcome("failedScenario");
+        testOutcome.setUserStory(STORY);
+        testOutcome.recordStep(TestStepFactory.getFailureTestStepWithAssertionError("Failed scenario step"));
+        testOutcome.setTestFailureCause(failureCause);
+
+        teamCityStepListener.testFinished(testOutcome);
+
+        String testStartedExpectedMessage = "##teamcity[testStarted  name='sprint-1.us-1.story.failedScenario' flowId='1']";
+        String testFailedExpectedMessage = "##teamcity[testFailed  message='the test is failed!' details='Steps:|r|nFailed scenario step (0.1) -> FAILURE|r|nStackTrace|r|n' name='sprint-1.us-1.story.failedScenario' flowId='1']";
+        String testFinishedExpectedMessage = "##teamcity[testFinished  duration='100' name='sprint-1.us-1.story.failedScenario' flowId='1']";
+
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(3)).info(stringArgumentCaptor.capture());
+
+        assertThat(stringArgumentCaptor.getAllValues().get(0), is(testStartedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(1), is(testFailedExpectedMessage));
+        assertThat(stringArgumentCaptor.getAllValues().get(2), is(testFinishedExpectedMessage));
     }
 
     private void verifyArgumentCaptorCapturesNoLoggerMessages() {
