@@ -1,4 +1,4 @@
-package com.github.crystalservice;
+package com.github.vase4kin;
 
 import net.thucydides.core.model.TestResult;
 import net.thucydides.core.model.TestStep;
