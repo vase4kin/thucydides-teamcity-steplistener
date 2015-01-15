@@ -6,13 +6,13 @@
         <artifactId>oss-parent</artifactId>
         <version>7</version>
     </parent>
-    <groupId>com.github.crystalservice</groupId>
+    <groupId>com.github.vase4kin</groupId>
     <artifactId>thucydides-teamcity-steplistener</artifactId>
     <version>0.3.8-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Thucydides teamCity stepListener</name>
     <description>Provide fast and easy test reporting during team city build process</description>
-    <url>https://github.com/crystalservice/thucydides-teamcity-steplistener</url>
+    <url>https://github.com/vase4kin/thucydides-teamcity-steplistener</url>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -21,9 +21,9 @@
         </license>
     </licenses>
     <scm>
-        <url>git@github.com:crystalservice/thucydides-teamcity-steplistener</url>
-        <connection>scm:git:git@github.com:crystalservice/thucydides-teamcity-steplistener.git</connection>
-        <developerConnection>scm:git:git@github.com:crystalservice/thucydides-teamcity-steplistener.git</developerConnection>
+        <url>git@github.com:vase4kin/thucydides-teamcity-steplistener</url>
+        <connection>scm:git:git@github.com:vase4kin/thucydides-teamcity-steplistener.git</connection>
+        <developerConnection>scm:git:git@github.com:vase4kin/thucydides-teamcity-steplistener.git</developerConnection>
     </scm>
     <developers>
         <developer>
@@ -62,7 +62,7 @@
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>2.2.0</version>
                 <configuration>
-                    <repoToken>sSNbthC4LPoCqJsVl5mnTIEfSUd8fCVHt</repoToken>
+                    <repoToken>7KZN7qXllhuVJ69oNJRXoSQmxRr8cpls3</repoToken>
                 </configuration>
             </plugin>
             <plugin>

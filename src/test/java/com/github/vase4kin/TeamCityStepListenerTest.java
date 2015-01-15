@@ -1,4 +1,4 @@
-package com.github.crystalservice;
+package com.github.vase4kin;
 
 import junit.framework.TestCase;
 import net.thucydides.core.model.*;
@@ -567,7 +567,7 @@ public class TeamCityStepListenerTest {
     public void testGetStackTraceMethod() {
 
         assertThat(new TeamCityStepListener().getStackTrace(THROWABLE), containsString("java.lang.Throwable: the test is failed!"));
-        assertThat(new TeamCityStepListener().getStackTrace(THROWABLE), containsString("com.github.crystalservice.TeamCityStepListenerTest.<clinit>(TeamCityStepListenerTest.java:"));
+        assertThat(new TeamCityStepListener().getStackTrace(THROWABLE), containsString("com.github.vase4kin.TeamCityStepListenerTest.<clinit>(TeamCityStepListenerTest.java:"));
     }
 
     @Test
