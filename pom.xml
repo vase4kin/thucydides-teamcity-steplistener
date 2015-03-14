@@ -8,7 +8,7 @@
     </parent>
     <groupId>com.github.vase4kin</groupId>
     <artifactId>thucydides-teamcity-steplistener</artifactId>
-    <version>0.3.8-SNAPSHOT</version>
+    <version>0.3.8</version>
     <packaging>jar</packaging>
     <name>Thucydides teamCity stepListener</name>
     <description>Provide fast and easy test reporting during team city build process</description>
